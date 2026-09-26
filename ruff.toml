@@ -1,0 +1,8 @@
+line-length = 120
+src = ["src"]
+
+[format]
+docstring-code-format = true
+
+[lint]
+select = ["E", "F", "W", "I", "B", "UP"]

@@ -1,0 +1,31 @@
+[env]
+_.fnox-env = { tools = true }
+_.python.venv = { path = ".venv", create = true }
+
+[plugins]
+fnox-env = "https://github.com/jdx/mise-env-fnox"
+
+[tools]
+actionlint = "1.7.12"
+fnox = "1.33.0"
+hk = "1.55.0"
+pkl = "0.32.1"
+ruff = "0.16.3"
+rumdl = "0.2.55"
+tombi = "1.4.0"
+ty = "0.0.72"
+uv = "0.12.5"
+yamlfmt = "0.21.0"
+"pipx:yamllint" = "1.38.0"
+
+[tasks.check]
+description = "Run all checks"
+run = "hk check --all"
+
+[tasks.fix]
+description = "Fix all issues"
+run = "hk fix --all"
+
+[tasks.test]
+description = "Run unit and integration tests"
+run = "uv run pytest --cov -k 'unit or integration'"

@@ -1,0 +1,14 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["github>trash-panda-v91-beta/renovate-config"],
+  "packageRules": [
+    {
+      "description": "Auto merge Python dependency updates",
+      "matchManagers": ["pep621", "uv"],
+      "automerge": true,
+      "automergeType": "branch",
+      "matchUpdateTypes": ["minor", "patch"],
+      "ignoreTests": true
+    }
+  ]
+}
