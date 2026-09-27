@@ -645,9 +645,10 @@ async def get_current_user() -> str:
 
 
 def main() -> None:
-    """Run the MCP server over stdio."""
+    """Run the MCP server."""
     logger.info(f"Starting mealie-mcp {__version__}")
-    mcp.run(transport="stdio")
+    # transport comes from FASTMCP_* env vars (default stdio); blocks until the server stops
+    mcp.run()
 
 
 if __name__ == "__main__":
