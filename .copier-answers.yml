@@ -1,0 +1,10 @@
+---
+# Changes here will be overwritten by Copier.
+_commit: 13c4feb
+_src_path: /Users/trash-panda-v91-beta/repos/github.com/trash-panda-v91-beta/repo-template
+container: true
+github_user: trash-panda-v91-beta
+language: python
+release_please: true
+repo_name: .
+tooling: false

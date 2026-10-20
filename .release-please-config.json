@@ -1,15 +1,15 @@
 {
 	"packages": {
 		".": {
-			"package-name": "mealie-mcp",
+			"package-name": ".",
 			"release-type": "python",
 			"extra-files": [
 				{ "type": "generic", "path": "README.md" },
-				{ "type": "toml", "path": "uv.lock", "jsonpath": "$.package[?(@.name.value=='mealie-mcp')].version" }
+				{ "type": "toml", "path": "uv.lock", "jsonpath": "$.package[?(@.name.value=='.')].version" }
 			]
 		}
 	},
-	"bump-minor-pre-major": false,
+	"bump-minor-pre-major": true,
 	"bump-patch-for-minor-pre-major": true,
 	"changelog-path": "CHANGELOG.md",
 	"pull-request-header": "",
