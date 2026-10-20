@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.3](https://github.com/trash-panda-v91-beta/mealie-mcp/compare/v0.1.2...v0.1.3) (2026-10-20)
+
+
+### Continuous Integration
+
+* auto-approve routine dep bumps ([#14](https://github.com/trash-panda-v91-beta/mealie-mcp/issues/14)) ([ad34048](https://github.com/trash-panda-v91-beta/mealie-mcp/commit/ad34048973282f26f2e88bfebc785f484e2958e0))
+
 ## [0.1.2](https://github.com/trash-panda-v91-beta/mealie-mcp/compare/v0.1.1...v0.1.2) (2026-09-27)
 
 
