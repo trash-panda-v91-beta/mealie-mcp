@@ -43,6 +43,9 @@ class TokenBucket:
                 await asyncio.sleep((tokens - self.tokens) / self.rate)
 
 
+_IMAGE_EXTENSIONS = {"image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/gif": "gif"}
+
+
 def _compact(params: dict[str, Any]) -> dict[str, Any]:
     """Drop null params and comma-join list filters (Mealie's list-filter format)."""
     out: dict[str, Any] = {}
@@ -229,6 +232,63 @@ class MealieClient:
     async def delete_recipe_comment(self, comment_id: str) -> None:
         """Delete a recipe comment."""
         await self._request("DELETE", f"/api/comments/{comment_id}")
+
+    # ==================== Recipe timeline ====================
+
+    async def list_timeline_events(
+        self, recipe_slug: str | None = None, page: int | None = None, per_page: int | None = None
+    ) -> Any:
+        """List timeline events: every recipe, or one recipe when a slug is given."""
+        filter_expr = None
+        if recipe_slug:
+            recipe = await self.get_recipe(recipe_slug)
+            filter_expr = f"recipe_id={recipe['id']}"
+        params = _compact({"queryFilter": filter_expr, "page": page, "perPage": per_page})
+        return await self._request("GET", "/api/recipes/timeline/events", params=params)
+
+    async def create_timeline_event(
+        self,
+        recipe_slug: str,
+        subject: str,
+        event_type: str = "comment",
+        event_message: str | None = None,
+        timestamp: str | None = None,
+    ) -> Any:
+        """Create a timeline event on a recipe. Events are keyed by recipe id, so the slug is resolved first."""
+        recipe = await self.get_recipe(recipe_slug)
+        payload = _compact(
+            {
+                "recipeId": recipe["id"],
+                "subject": subject,
+                "eventType": event_type,
+                "eventMessage": event_message,
+                "timestamp": timestamp,
+            }
+        )
+        return await self._request("POST", "/api/recipes/timeline/events", json=payload)
+
+    async def update_timeline_event(self, event_id: str, subject: str, event_message: str | None = None) -> Any:
+        """Change an event's subject and message (PUT; the event type and timestamp stay)."""
+        payload = _compact({"subject": subject, "eventMessage": event_message})
+        return await self._request("PUT", f"/api/recipes/timeline/events/{event_id}", json=payload)
+
+    async def delete_timeline_event(self, event_id: str) -> None:
+        """Delete a timeline event."""
+        await self._request("DELETE", f"/api/recipes/timeline/events/{event_id}")
+
+    async def set_timeline_event_image(self, event_id: str, image_url: str) -> Any:
+        """Attach an image to a timeline event, downloading it from a URL first (Mealie wants the bytes)."""
+        async with httpx.AsyncClient(timeout=30.0, follow_redirects=True) as http:
+            response = await http.get(image_url)
+            response.raise_for_status()
+            image, content_type = response.content, response.headers.get("content-type", "")
+        extension = _IMAGE_EXTENSIONS.get(content_type.split(";")[0].strip(), "jpg")
+        return await self._request(
+            "PUT",
+            f"/api/recipes/timeline/events/{event_id}/image",
+            files={"image": (f"image.{extension}", image, content_type or "application/octet-stream")},
+            data={"extension": extension},
+        )
 
     # ==================== Meal plans ====================
 

@@ -12,6 +12,7 @@ BASE = "https://mealie.example.com"
 
 SAMPLE_RECIPE = {"id": "abc", "slug": "test-recipe", "name": "Test Recipe", "tags": []}
 SAMPLE_COMMENT = {"id": "c1", "recipeId": "abc", "text": "tasty"}
+SAMPLE_EVENT = {"id": "e1", "recipeId": "abc", "subject": "Petr made this", "eventType": "comment"}
 
 
 @pytest.fixture
@@ -117,6 +118,53 @@ class TestRecipeComments:
     async def test_delete_comment_empty_body(self, client, httpx2_mock: HTTPXMock):
         httpx2_mock.add_response(url=f"{BASE}/api/comments/c1", status_code=200, content=b"", method="DELETE")
         assert await client.delete_recipe_comment("c1") is None
+
+
+class TestRecipeTimeline:
+    @pytest.mark.asyncio
+    async def test_list_filters_by_recipe(self, client, httpx2_mock: HTTPXMock):
+        httpx2_mock.add_response(url=f"{BASE}/api/recipes/test-recipe", json=SAMPLE_RECIPE)
+        httpx2_mock.add_response(
+            url=f"{BASE}/api/recipes/timeline/events?queryFilter=recipe_id%3Dabc&page=1&perPage=50",
+            json={"items": [SAMPLE_EVENT]},
+        )
+        result = await client.list_timeline_events("test-recipe", 1, 50)
+        assert result["items"][0]["subject"] == "Petr made this"
+
+    @pytest.mark.asyncio
+    async def test_create_resolves_slug_and_defaults_to_comment(self, client, httpx2_mock: HTTPXMock):
+        httpx2_mock.add_response(url=f"{BASE}/api/recipes/test-recipe", json=SAMPLE_RECIPE)
+        httpx2_mock.add_response(url=f"{BASE}/api/recipes/timeline/events", json=SAMPLE_EVENT, method="POST")
+        await client.create_timeline_event("test-recipe", "Petr made this")
+        assert json.loads(httpx2_mock.get_requests()[-1].content) == {
+            "recipeId": "abc",
+            "subject": "Petr made this",
+            "eventType": "comment",
+        }
+
+    @pytest.mark.asyncio
+    async def test_update_omits_message_when_not_given(self, client, httpx2_mock: HTTPXMock):
+        httpx2_mock.add_response(url=f"{BASE}/api/recipes/timeline/events/e1", json=SAMPLE_EVENT, method="PUT")
+        await client.update_timeline_event("e1", "Fixed the salt")
+        assert json.loads(httpx2_mock.get_requests()[-1].content) == {"subject": "Fixed the salt"}
+
+    @pytest.mark.asyncio
+    async def test_delete_event_empty_body(self, client, httpx2_mock: HTTPXMock):
+        httpx2_mock.add_response(
+            url=f"{BASE}/api/recipes/timeline/events/e1", status_code=200, content=b"", method="DELETE"
+        )
+        assert await client.delete_timeline_event("e1") is None
+
+    @pytest.mark.asyncio
+    async def test_set_image_downloads_then_uploads_bytes(self, client, httpx2_mock: HTTPXMock):
+        httpx2_mock.add_response(
+            url="https://images.example.com/bread.png", content=b"PNGDATA", headers={"content-type": "image/png"}
+        )
+        httpx2_mock.add_response(url=f"{BASE}/api/recipes/timeline/events/e1/image", json=SAMPLE_EVENT, method="PUT")
+        await client.set_timeline_event_image("e1", "https://images.example.com/bread.png")
+        upload = httpx2_mock.get_requests()[-1].content
+        assert b"PNGDATA" in upload
+        assert b'name="extension"' in upload and b"png" in upload
 
 
 class TestOrganizers:
