@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.1.3](https://github.com/trash-panda-v91-beta/mealie-mcp/compare/v0.1.2...v0.1.3) (2026-11-14)
+
+
+### Features
+
+* add recipe comment tools ([#18](https://github.com/trash-panda-v91-beta/mealie-mcp/issues/18)) ([85882d5](https://github.com/trash-panda-v91-beta/mealie-mcp/commit/85882d58d4753156815f821fbc0e33c7b1d954f3))
+* add recipe timeline event tools ([#19](https://github.com/trash-panda-v91-beta/mealie-mcp/issues/19)) ([2158f6c](https://github.com/trash-panda-v91-beta/mealie-mcp/commit/2158f6c96d8a3c0b09e9d709598d8a305590c3bc))
+
+
+### Bug Fixes
+
+* **deps:** update fastmcp ( 4.0.9 ➔ 4.0.10 ) ([#8](https://github.com/trash-panda-v91-beta/mealie-mcp/issues/8)) ([d599252](https://github.com/trash-panda-v91-beta/mealie-mcp/commit/d5992526d81f4228dbff82ff3627a9238257ef43))
+
+
+### Continuous Integration
+
+* auto-approve routine dep bumps ([#14](https://github.com/trash-panda-v91-beta/mealie-mcp/issues/14)) ([ad34048](https://github.com/trash-panda-v91-beta/mealie-mcp/commit/ad34048973282f26f2e88bfebc785f484e2958e0))
+* **github-action:** update actions/create-github-app-token ( v3.2.0 ➔ v3.3.0 ) ([#12](https://github.com/trash-panda-v91-beta/mealie-mcp/issues/12)) ([83c1ddf](https://github.com/trash-panda-v91-beta/mealie-mcp/commit/83c1ddf8cd61c5f3f6636f5814b326a6a4408a61))
+
 ## [0.1.2](https://github.com/trash-panda-v91-beta/mealie-mcp/compare/v0.1.1...v0.1.2) (2026-09-27)
 
 
