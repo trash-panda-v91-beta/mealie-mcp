@@ -207,6 +207,29 @@ class MealieClient:
         """Scrape and set a recipe's image from a URL."""
         return await self._request("POST", f"/api/recipes/{slug}/image", json={"url": image_url})
 
+    # ==================== Recipe comments ====================
+
+    async def list_recipe_comments(self, slug: str) -> Any:
+        """List the comments on a recipe (recipe-scoped list, not paginated)."""
+        return await self._request("GET", f"/api/recipes/{slug}/comments")
+
+    async def get_recipe_comment(self, comment_id: str) -> Any:
+        """Get a single recipe comment by ID."""
+        return await self._request("GET", f"/api/comments/{comment_id}")
+
+    async def create_recipe_comment(self, slug: str, text: str) -> Any:
+        """Post a comment on a recipe. Comments are keyed by recipe id, so the slug is resolved first."""
+        recipe = await self.get_recipe(slug)
+        return await self._request("POST", "/api/comments", json={"recipeId": recipe["id"], "text": text})
+
+    async def update_recipe_comment(self, comment_id: str, text: str) -> Any:
+        """Replace a comment's text (PUT, and Mealie wants the id in the body too)."""
+        return await self._request("PUT", f"/api/comments/{comment_id}", json={"id": comment_id, "text": text})
+
+    async def delete_recipe_comment(self, comment_id: str) -> None:
+        """Delete a recipe comment."""
+        await self._request("DELETE", f"/api/comments/{comment_id}")
+
     # ==================== Meal plans ====================
 
     async def list_mealplans(
