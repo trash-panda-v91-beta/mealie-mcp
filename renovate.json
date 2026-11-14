@@ -1,13 +1,30 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["github>trash-panda-v91-beta/renovate-config"],
+  "mise": {
+    "enabled": true
+  },
   "packageRules": [
+    {
+      "description": "Group GitHub Actions updates into one PR",
+      "groupName": "github-actions",
+      "matchManagers": ["github-actions"]
+    },
     {
       "description": "Auto merge Python dependency updates",
       "matchManagers": ["pep621", "uv"],
       "automerge": true,
       "automergeType": "branch",
       "matchUpdateTypes": ["minor", "patch"],
+      "ignoreTests": true
+    },
+    {
+      "description": "Auto merge mise tool updates",
+      "matchManagers": ["mise"],
+      "automerge": true,
+      "automergeType": "pr",
+      "matchUpdateTypes": ["minor", "patch", "digest"],
+      "minimumReleaseAge": "3 days",
       "ignoreTests": true
     }
   ]
