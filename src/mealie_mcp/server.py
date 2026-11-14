@@ -258,6 +258,75 @@ async def set_recipe_image_from_url(slug: str, image_url: str) -> str:
     return _dump(await c.set_recipe_image_from_url(slug, image_url))
 
 
+# ==================== Recipe comments ====================
+
+
+@mcp.tool()
+@_guard
+async def list_recipe_comments(slug: str) -> str:
+    """List the comments on a recipe.
+
+    Args:
+        slug: Recipe slug (from list_recipes).
+    """
+    c = await get_client()
+    result = await c.list_recipe_comments(slug)
+    if isinstance(result, list) and not result:
+        return "No comments on this recipe."
+    return _dump(result)
+
+
+@mcp.tool()
+@_guard
+async def get_recipe_comment(comment_id: str) -> str:
+    """Get a single recipe comment.
+
+    Args:
+        comment_id: Comment ID (from list_recipe_comments).
+    """
+    c = await get_client()
+    return _dump(await c.get_recipe_comment(comment_id))
+
+
+@mcp.tool()
+@_guard
+async def create_recipe_comment(slug: str, text: str) -> str:
+    """Post a comment on a recipe.
+
+    Args:
+        slug: Recipe slug.
+        text: Comment body.
+    """
+    c = await get_client()
+    return _dump(await c.create_recipe_comment(slug, text))
+
+
+@mcp.tool()
+@_guard
+async def update_recipe_comment(comment_id: str, text: str) -> str:
+    """Replace the text of an existing comment.
+
+    Args:
+        comment_id: Comment ID.
+        text: New comment body.
+    """
+    c = await get_client()
+    return _dump(await c.update_recipe_comment(comment_id, text))
+
+
+@mcp.tool()
+@_guard
+async def delete_recipe_comment(comment_id: str) -> str:
+    """Delete a recipe comment.
+
+    Args:
+        comment_id: Comment ID.
+    """
+    c = await get_client()
+    await c.delete_recipe_comment(comment_id)
+    return f"Deleted comment {comment_id}."
+
+
 # ==================== Meal plans ====================
 
 
