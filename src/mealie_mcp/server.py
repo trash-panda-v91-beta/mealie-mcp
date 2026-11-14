@@ -327,6 +327,89 @@ async def delete_recipe_comment(comment_id: str) -> str:
     return f"Deleted comment {comment_id}."
 
 
+# ==================== Recipe timeline ====================
+
+
+@mcp.tool()
+@_guard
+async def list_timeline_events(recipe_slug: str | None = None, page: int = 1, per_page: int = 50) -> str:
+    """List recipe timeline events, newest first.
+
+    Args:
+        recipe_slug: Only this recipe's events; omit for every recipe.
+        page: Page number (1-based).
+        per_page: Results per page.
+    """
+    c = await get_client()
+    result = await c.list_timeline_events(recipe_slug, page, per_page)
+    items = result.get("items", []) if isinstance(result, dict) else result
+    if isinstance(items, list) and not items:
+        return "No timeline events."
+    return _dump(result)
+
+
+@mcp.tool()
+@_guard
+async def create_timeline_event(
+    recipe_slug: str,
+    subject: str,
+    event_type: str = "comment",
+    event_message: str | None = None,
+    timestamp: str | None = None,
+) -> str:
+    """Add an event to a recipe's timeline. "I made this" is event_type="comment" with a subject.
+
+    Args:
+        recipe_slug: Recipe slug (from list_recipes).
+        subject: Short headline, e.g. "Petr made this".
+        event_type: "comment" (what the UI's made-it button writes), "info", or "system" (Mealie's own).
+        event_message: Optional body text, e.g. what was changed or how it turned out.
+        timestamp: ISO timestamp; defaults to now.
+    """
+    c = await get_client()
+    return _dump(await c.create_timeline_event(recipe_slug, subject, event_type, event_message, timestamp))
+
+
+@mcp.tool()
+@_guard
+async def update_timeline_event(event_id: str, subject: str, event_message: str | None = None) -> str:
+    """Edit a timeline event's subject and message. Type and timestamp are not editable.
+
+    Args:
+        event_id: Event ID (from list_timeline_events).
+        subject: New headline.
+        event_message: New body text; leave out to keep it as it is.
+    """
+    c = await get_client()
+    return _dump(await c.update_timeline_event(event_id, subject, event_message))
+
+
+@mcp.tool()
+@_guard
+async def delete_timeline_event(event_id: str) -> str:
+    """Delete a timeline event.
+
+    Args:
+        event_id: Event ID.
+    """
+    c = await get_client()
+    await c.delete_timeline_event(event_id)
+    return f"Deleted timeline event {event_id}."
+
+
+@mcp.tool()
+@_guard
+async def set_timeline_event_image(event_id: str, image_url: str) -> str:
+    """Attach a picture to a timeline event, fetched from a URL.
+
+    Args:
+        event_id: Event ID.
+        image_url: Direct URL of the image (jpg, png, webp or gif).
+    """
+    c = await get_client()
+    return _dump(await c.set_timeline_event_image(event_id, image_url))
+
+
 # ==================== Meal plans ====================
 
 
