@@ -28,12 +28,18 @@ class TestToolList:
     async def test_tool_count(self):
         tools = await server.mcp.list_tools()
         names = {t.name for t in tools}
-        assert len(tools) == 40
+        assert len(tools) == 50
         assert {
             "list_recipes",
             "get_recipe",
             "import_recipe_from_url",
             "patch_recipe",
+            "list_recipe_comments",
+            "create_recipe_comment",
+            "delete_recipe_comment",
+            "list_timeline_events",
+            "create_timeline_event",
+            "set_timeline_event_image",
             "list_mealplans",
             "get_todays_mealplan",
             "create_mealplan",
@@ -82,6 +88,40 @@ class TestRecipeTools:
         httpx2_mock.add_response(url=f"{BASE}/api/recipes/test-recipe", status_code=401, json={"detail": "nope"})
         result = await call_tool("get_recipe", {"slug": "test-recipe"})
         assert "Authentication failed" in result[0].text
+
+
+class TestCommentTools:
+    @pytest.mark.asyncio
+    async def test_list_comments_empty(self, httpx2_mock: HTTPXMock):
+        httpx2_mock.add_response(url=f"{BASE}/api/recipes/test-recipe/comments", json=[])
+        result = await call_tool("list_recipe_comments", {"slug": "test-recipe"})
+        assert "No comments" in result[0].text
+
+    @pytest.mark.asyncio
+    async def test_create_comment(self, httpx2_mock: HTTPXMock):
+        httpx2_mock.add_response(url=f"{BASE}/api/recipes/test-recipe", json=SAMPLE_RECIPE)
+        httpx2_mock.add_response(url=f"{BASE}/api/comments", json={"id": "c1", "text": "tasty"}, method="POST")
+        result = await call_tool("create_recipe_comment", {"slug": "test-recipe", "text": "tasty"})
+        assert json.loads(result[0].text)["id"] == "c1"
+
+
+class TestTimelineTools:
+    @pytest.mark.asyncio
+    async def test_create_made_it_event(self, httpx2_mock: HTTPXMock):
+        httpx2_mock.add_response(url=f"{BASE}/api/recipes/test-recipe", json=SAMPLE_RECIPE)
+        httpx2_mock.add_response(
+            url=f"{BASE}/api/recipes/timeline/events",
+            json={"id": "e1", "subject": "Petr made this", "eventType": "comment"},
+            method="POST",
+        )
+        result = await call_tool("create_timeline_event", {"recipe_slug": "test-recipe", "subject": "Petr made this"})
+        assert json.loads(result[0].text)["id"] == "e1"
+
+    @pytest.mark.asyncio
+    async def test_list_events_empty(self, httpx2_mock: HTTPXMock):
+        httpx2_mock.add_response(url=f"{BASE}/api/recipes/timeline/events?page=1&perPage=50", json={"items": []})
+        result = await call_tool("list_timeline_events", {})
+        assert "No timeline events" in result[0].text
 
 
 class TestShoppingTools:

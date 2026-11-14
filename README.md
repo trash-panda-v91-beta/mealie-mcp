@@ -38,6 +38,10 @@ docker run -i --rm \
 - Recipes: `list_recipes`, `get_recipe`, `create_recipe`, `import_recipe_from_url`,
   `update_recipe`, `patch_recipe`, `delete_recipe`, `duplicate_recipe`,
   `mark_recipe_last_made`, `set_recipe_image_from_url`
+- Recipe comments: `list_recipe_comments`, `get_recipe_comment`, `create_recipe_comment`,
+  `update_recipe_comment`, `delete_recipe_comment`
+- Recipe timeline: `list_timeline_events`, `create_timeline_event`, `update_timeline_event`,
+  `delete_timeline_event`, `set_timeline_event_image`
 - Meal plans: `list_mealplans`, `get_todays_mealplan`, `create_mealplan`, `delete_mealplan`
 - Shopping lists: `list_shopping_lists`, `get_shopping_list`, `create_shopping_list`,
   `delete_shopping_list`, `add_recipe_to_shopping_list`, `remove_recipe_from_shopping_list`
